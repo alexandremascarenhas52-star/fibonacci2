@@ -1,7 +1,24 @@
-num_repetitions = int(input("Enter the number of repetitions for the Fibonacci sequence: "))
+import streamlit as st
+import matplotlib.pyplot as plt
 
+# Configurar a página
+st.set_page_config(page_title="Fibonacci Sequence", layout="centered", initial_sidebar_state="expanded")
+st.title("🔢 Gerador de Sequência de Fibonacci")
+
+# Criar sidebar para entrada
+with st.sidebar:
+    st.header("Configurações")
+    num_repetitions = st.number_input(
+        "Digite o número de repetições:",
+        min_value=1,
+        max_value=100,
+        value=10,
+        step=1
+    )
+
+# Gerar sequência de Fibonacci
 if num_repetitions <= 0:
-    print("Please enter a positive integer.")
+    st.error("Por favor, digite um número inteiro positivo.")
 elif num_repetitions == 1:
     fib_sequence = [0]
 elif num_repetitions == 2:
@@ -12,4 +29,45 @@ else:
         next_fib = fib_sequence[-1] + fib_sequence[-2]
         fib_sequence.append(next_fib)
 
-print("Fibonacci Sequence:", fib_sequence)
+# Exibir resultados
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.subheader("Sequência Gerada:")
+    st.info(f"**{fib_sequence}**")
+
+with col2:
+    st.metric("Quantidade", len(fib_sequence))
+
+# Exibir estatísticas
+st.divider()
+st.subheader("📊 Estatísticas")
+
+tab1, tab2, tab3 = st.tabs(["Tabela", "Gráfico", "Informações"])
+
+with tab1:
+    # Criar tabela com índice e valor
+    data = {"Posição": list(range(1, len(fib_sequence) + 1)), "Valor": fib_sequence}
+    st.dataframe(data, use_container_width=True)
+
+with tab2:
+    # Criar gráfico
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(range(len(fib_sequence)), fib_sequence, color="steelblue", alpha=0.8)
+    ax.set_xlabel("Posição")
+    ax.set_ylabel("Valor")
+    ax.set_title("Sequência de Fibonacci")
+    ax.grid(axis="y", alpha=0.3)
+    st.pyplot(fig)
+
+with tab3:
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Maior valor", fib_sequence[-1])
+    
+    with col2:
+        st.metric("Soma total", sum(fib_sequence))
+    
+    with col3:
+        st.metric("Total de termos", len(fib_sequence))
